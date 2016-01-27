@@ -1,5 +1,8 @@
 package com.gm.product.browse.services;
 
+import java.util.Collection;
+import java.util.List;
+
 import javax.annotation.PreDestroy;
 
 import com.couchbase.client.java.Bucket;
@@ -7,9 +10,12 @@ import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.CouchbaseCluster;
 import com.couchbase.client.java.document.JsonDocument;
 import com.couchbase.client.java.document.json.JsonObject;
+import com.couchbase.client.java.view.ViewQuery;
+import com.couchbase.client.java.view.ViewResult;
 import com.gm.product.browse.config.ProductConfiguration;
 
 import rx.Observable;
+import rx.functions.Func1;
 
 
 public class CouchbaseManager {
@@ -65,6 +71,14 @@ public class CouchbaseManager {
     }
 
     /**
+     * READ the document from database
+     */
+    public Observable<JsonDocument> readAsync(String id) {
+    	System.out.println("**********"+id);
+        return bucket.async().get(id);
+    }
+    
+    /**
      * UPDATE the document in database
      * @return the updated document, with up to date metadata
      */
@@ -79,6 +93,43 @@ public class CouchbaseManager {
     public JsonDocument delete(String id) {
         return bucket.remove(id);
     }
-
     
+    /**
+     * 
+     * @param productType
+     * @param offset
+     * @param limit
+     * @return
+     */
+    public ViewResult findAllByCriteria(String designName, String viewName, String productType, Integer offset, Integer limit) {
+        //ViewQuery query = ViewQuery.from("dev_product", "ProductByType").key(productType);
+    	ViewQuery query = ViewQuery.from(designName, viewName).key(productType);
+        if (limit != null && limit > 0) {
+            query.limit(limit);
+        }
+        if (offset != null && offset > 0) {
+            query.skip(offset);
+        }
+        ViewResult result = bucket.query(query);
+        return result;
+    }
+   
+    /**
+     * 
+     * @param ids
+     * @return
+     */
+    public List<JsonDocument> batchGet(final Collection<String> ids) {
+        return Observable
+            .from(ids)
+            .flatMap(new Func1<String, Observable<JsonDocument>>() {
+                @Override
+                public Observable<JsonDocument> call(String id) {
+                    return readAsync(id);
+                }
+            })
+            .toList()
+            .toBlocking()
+            .single();
+    }
 }
