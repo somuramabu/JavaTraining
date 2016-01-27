@@ -1,0 +1,6 @@
+couchbase:
+  bucket: default
+  password:
+  nodes: http://localhost:9090
+server.port:  9090
+logging.level.com.couchbase: DEBUG
