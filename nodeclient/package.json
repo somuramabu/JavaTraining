@@ -1,0 +1,16 @@
+{
+  "name": "node-client",
+  "version": "1.0.0",
+  "description": "a client service which orchestrates calls to produt and price microservices",
+  "main": "index.js",
+  "scripts": {
+      "start": "node index.js"
+  },
+  "author": "Ram",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^1.5.2",
+    "express": "^4.13.4",
+    "request": "^2.69.0"
+  }
+}
