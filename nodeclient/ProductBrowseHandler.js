@@ -57,8 +57,8 @@ exports.batchHandler = function(req, res) {
 };
 
 function getProducts(req,res,prodcutDetailsArray,callback) {
-  var id = req.param('id');
-  var url = "http://localhost:8080/product?type=stationary";
+  var type = req.param('type');
+  var url = "http://localhost:8080/product?type="+type;
   request(url, function(err, response, body) {
     console.log("Product");
       if(err)
