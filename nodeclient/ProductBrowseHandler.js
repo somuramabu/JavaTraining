@@ -50,9 +50,7 @@ exports.batchHandler = function(req, res) {
       getPriceInfoForProdcuts
   ], function (err, result) {
     if(err) { console.log(err); res.send(500,"Server Error"); return; }
-    console.log("---------------------------------------");
     console.log(result);
-    //res.send(result);
   });
 };
 
@@ -72,32 +70,29 @@ function getProducts(req,res,prodcutDetailsArray,callback) {
   });
 }
 function getPriceInfoForProdcuts(products,res, callback) {
-  var urls =  {products:[]};
-  var priceUrlMap =  [];
+  var map =  {products:[]};
   console.log(products);
   for(var i=0 ;i<products.length;i++){
     var productId = products[i].id
     var tokens = productId.split("-");
     if (tokens[1] != undefined){
-      urls.products.push({"url":"http://localhost:9090/price/price-"+tokens[1],"prodcut":products[i]});
+      map.products.push({"url":"http://localhost:9090/price/price-"+tokens[1],"prodcut":products[i]});
     }
   }
-  console.log(urls);
-  async.map(urls.products,function (url,callback){
-          console.log("getPrice"+url);
-          console.log(url.prodcut);
-          request(url.url, function(err, response, body) {
+  console.log(products);
+  async.map(map.products,function (entry,callback){
+          console.log("getPrice"+entry);
+          console.log(entry.prodcut);
+          request(entry.url, function(err, response, body) {
               console.log("Price Request Happend");
               if(err) { console.log(err); callback(true); return; }
               obj = JSON.parse(body);
               console.log(body);
-              callback(err,{"product":url.prodcut,"price":obj});
-              //prodcutDetailsArray.products.push({"product":product,"price":obj});
+              callback(err,{"product":entry.prodcut,"price":obj});
           });
         },function (err, result) {
           if(err) { console.log(err); res.send(500,"Server Error"); return; }
           console.log(result);
-          console.log(products);
           res.send(result);
       })
       callback(null, products);
