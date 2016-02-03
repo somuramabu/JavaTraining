@@ -4,7 +4,7 @@
 
   <groupId>com.sapient</groupId>
   <artifactId>jenkins-param</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>${env.VERSION}</version>
   <packaging>jar</packaging>
 
   <name>jenkins-param</name>
